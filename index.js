@@ -1,42 +1,53 @@
-const http = require('http');
-// const url = require('url');
+const express = require('express');
 const fs = require('fs');
+const app = express();
 
-const hostname = '127.0.0.1';
-const port = 3000;
+const port = 8000;
 
-const server = http.createServer((req, res) => {
-  let parsedUrl = new URL(req.url, 'http://localhost:3000');
-
-  let urlPath = parsedUrl.pathname;
-
-  if(urlPath == '/') {
-    urlPath = './index.html';
-  }else {
-    urlPath = './' + urlPath + '.html';
-  }
-
-  fs.readFile(urlPath, function(err, data) {
+app.get('/', (req, res, next) => {
+  fs.readFile('./index.html', function(err, data) {
     if(err) {
-      fs.readFile('./404.html', (err, data) => {
-        if(err) {
-          res.writeHead(404, {'Content-Type': 'text/html'});
-          res.write('404 file not found');
-          return res.end();
-        }
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.write(data);
-        return res.end();
-      })
+      console.log('error while reading file ', err);
     }else {
-      res.writeHead(200, {'Content-Type': 'text/html'});
-      res.write(data);
-      return res.end()
+      res.status(200).write(data);
+      res.end();
     }
   });
-  
 });
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}`);
+app.get('/about', (req, res) => {
+  fs.readFile('./about.html', function(err, data) {
+    if(err) {
+      console.log('error while reading file ', err);
+    }else {
+      res.status(200).write(data);
+      res.end();
+    }
+  });
+});
+
+app.get('/contact', (req, res) => {
+  fs.readFile('./contact-me.html', function(err, data) {
+    if(err) {
+      console.log('error while reading file ', err);
+    }else {
+      res.status(200).write(data);
+      res.end();
+    }
+  });
+});
+
+app.use(function (req,res,next){
+  fs.readFile('./404.html', function(err, data) {
+    if(err) {
+      console.log('error while reading 404.html ', err);
+    }else {
+      res.status(404).write(data);
+      res.end();
+    }
+  })
+});
+
+app.listen(port, () => {
+  console.log(`Express App running on port ${port}`);
 });
