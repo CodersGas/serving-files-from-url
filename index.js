@@ -1,8 +1,9 @@
+require("dotenv").config();
 const express = require('express');
 const fs = require('fs');
 const app = express();
 
-const port = 8000;
+const port = process.env.PORT;
 
 app.get('/', (req, res, next) => {
   fs.readFile('./index.html', function(err, data) {
